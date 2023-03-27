@@ -3,8 +3,13 @@ Tic Tac Toe game implemented via MIPS on MARS for UTD CS 2340. (Final Project)
 
 To do:
 
-1. Make a bot that randomly places their piece
+ 1. Make a bot that randomly places their piece
  2. Check win (for loops: 2 for loops for diagonals, 3 for horizontals and 3 for verticals) 
+ 3. Computer's Move -- Pranav, Max
+ 4. Check win conditions: Cici, Thi
+    a. Horizontal
+    b. Vertical
+ 
 
 
 Test Cases to ask Prof
