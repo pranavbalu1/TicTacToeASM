@@ -22,16 +22,7 @@
 	addi $t0, $t0, 0
 	addi $t1, $t1, 1
 	
-	#Making our registers zero. I use this chunk of code frequently throughout the program
-	MakingRegistersZero:
-		add $t1, $zero, 0
-		add $t4, $zero, 0
-		add $t6, $zero, 0
-		add $t7, $zero, 0
-		add $a0, $zero, 0
-		add $s0, $zero, 0
-		jr $ra
-			
+
 	#This chunk of code populates our array (our tictactoe board with the 9 numbers)
 	fillingArray:
 		sw $t1, Numbers($t0)
@@ -98,7 +89,17 @@
 		goBacksixth:
 			jr $ra
 
-	
+
+	#Making our registers zero. I use this chunk of code frequently throughout the program
+	MakingRegistersZero:
+		add $t1, $zero, 0
+		add $t4, $zero, 0
+		add $t6, $zero, 0
+		add $t7, $zero, 0
+		add $a0, $zero, 0
+		add $s0, $zero, 0
+		jr $ra
+				
 
 	#Getting the number from the user corresponding to the board
 	userInput:
