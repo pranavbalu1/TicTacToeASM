@@ -21,6 +21,7 @@
 	numOfBoardSpaces:  .word 9
 	true:		   .word 1
 	false:		   .word 0
+	enterToContinue: .asciiz "Press 1 for the computer to go: "
 	
 	 
 .text
@@ -41,9 +42,51 @@ main:
 		
 		beq $s2, $s4, exitWhileLoop
 		
-		# getComputerMove
-      		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
-      		# jal printBoard 
+		#GETTING THE COMPUTER MOVE
+		getComputerMoveX:
+		
+		#Getting random number 1-9 and storing it in t0
+		add $t0 $zero, 0 
+		li $a1,  9
+		li $v0,  42
+		syscall
+		addi $t0, $a0, 0
+		
+		#Checking to see if the number that was randomly rolled is already in use, if not, go to "input_valid_spaceX" if so, jump back to start of RandomNumberX
+		la $t1, myArray          		# Load the base address of myArray into $t1.
+		add $t1, $t1, $t0        		# $t1 = $t1 + $t0 for array address to access = base address + offset
+		lb $t2, ($t1)            		# Load the character at the array address into $t2.
+		li $t3, 32               		# The ASCII code for ' ' is 32.
+		beq $t2, $t3, input_valid_spaceX 	# Branch to input_valid_space
+		j getComputerMoveX
+		
+		#Since the random number is valid, input it onto the board
+		input_valid_spaceX:
+		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
+		la $t1, myArray	      	
+		add $t1, $t1, $t0	# $t1 = $t1 + $t0
+		sb $s1, ($t1)
+		
+		#new line
+		li $v0, 4
+		la $a0, newline
+		syscall
+		
+		#giving the user a buffer to continue the program to not overwhelm them
+		li $v0, 4
+		la $a0, enterToContinue
+		syscall
+		li $v0, 5
+		syscall
+		
+		#new line
+		li $v0, 4
+		la $a0, newline
+		syscall
+		
+		#printing the new board with the computers move on it
+		jal printBoard
+		
       		# isWinYet      
       		
 		j whileLoopX		#  Jump back to the whileLoopX label
@@ -58,6 +101,55 @@ main:
       		jal userInput		#
 		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
 		jal printBoard		#
+		
+		#GETTING THE COMPUTER MOVE
+		getComputerMoveO:
+		
+		#Getting random number 1-9 and storing it in t0
+		add $t0 $zero, 0 
+		li $a1,  9
+		li $v0,  42
+		syscall
+		addi $t0, $a0, 0
+		
+		#Checking to see if the number that was randomly rolled is already in use, if not, go to "input_valid_spaceX" if so, jump back to start of RandomNumberX
+		la $t1, myArray          		# Load the base address of myArray into $t1.
+		add $t1, $t1, $t0        		# $t1 = $t1 + $t0 for array address to access = base address + offset
+		lb $t2, ($t1)            		# Load the character at the array address into $t2.
+		li $t3, 32               		# The ASCII code for ' ' is 32.
+		beq $t2, $t3, input_valid_spaceO	# Branch to input_valid_space
+		j getComputerMoveO
+		
+		#Since the random number is valid, input it onto the board
+		input_valid_spaceO:
+		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
+		la $t1, myArray	      	
+		add $t1, $t1, $t0	# $t1 = $t1 + $t0
+		sb $s1, ($t1)
+		
+		#new line
+		li $v0, 4
+		la $a0, newline
+		syscall
+		
+		#giving the user a buffer to continue the program to not overwhelm them
+		li $v0, 4
+		la $a0, enterToContinue
+		syscall
+		li $v0, 5
+		syscall
+		
+		#new line
+		li $v0, 4
+		la $a0, newline
+		syscall
+		
+		#printing the new board with the computers move on it
+		jal printBoard
+	
+		
+		
+		
 		# isWinYet
 	
 		j whileLoopO		# Jump back to the whileLoopO label
