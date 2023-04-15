@@ -1,27 +1,31 @@
 .data
-	str1: .asciiz "Your Turn: Enter the board position of your move (1-9):"
-	input_board_str1:  .asciiz " 1 | 2 | 3 \n"
-	input_board_str2:  .asciiz "---+---+---\n"
-	input_board_str3:  .asciiz " 4 | 5 | 6 \n"
-	input_board_str4:  .asciiz "---+---+---\n"
-	input_board_str5:  .asciiz " 7 | 8 | 9 \n"
-	output_board_str1: .asciiz " "
-	output_board_str2: .asciiz " | "
-	output_board_str3: .asciiz "---+---+---\n"
-	newline:	   .asciiz "\n"
-	input_X_or_O:	   .asciiz "Would you rather play as X or O?"
-	tie_message:	   .asciiz "Tie Game"
-	header_1: .asciiz "  _____     _                      _____                            _____                  \n"
-	header_2: .asciiz " |_   _|   (_)     __       o O O |_   _|  __ _     __       o O O |_   _|   ___     ___   \n"
-	header_3: .asciiz "   | |     | |    / _|     o        | |   / _` |   / _|     o        | |    / _ \\   / -_)  \n"
-	header_4: .asciiz "  _|_|_   _|_|_   \\__|_   TS__[O]  _|_|_  \\__,_|   \\__|_   TS__[O]  _|_|_   \\___/   \\___|  \n"
-	header_5: .asciiz "_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| \n"
-	header_6: .asciiz "\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-' \n"
-	myArray: 	   .byte ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '
-	numOfBoardSpaces:  .word 9
-	true:		   .word 1
-	false:		   .word 0
-	enterToContinue: .asciiz "Press 1 for the computer to go: "
+	str1: 			.asciiz "\nYour Turn: Enter the board position of your move (1-9): "
+	input_board_str1:  	.asciiz "\n 1 | 2 | 3 \n"
+	input_board_str2:  	.asciiz "---+---+---\n"
+	input_board_str3:  	.asciiz " 4 | 5 | 6 \n"
+	input_board_str4:  	.asciiz "---+---+---\n"
+	input_board_str5:  	.asciiz " 7 | 8 | 9 \n"
+	output_board_str1: 	.asciiz " "
+	output_board_str2: 	.asciiz " | "
+	output_board_str3: 	.asciiz "---+---+---\n"
+	newline:	   	.asciiz "\n"
+	input_X_or_O:	   	.asciiz "\nInput whether you would like to play as X or O: "
+	error_message_X0:  	.asciiz "\nError: You may only enter 'X' or 'O' (Capitalized)."
+	error_message_1_9: 	.asciiz "\nError: You may not enter a number below 1 or above 9."
+	error_message_space:	.asciiz "\nError: You may only choose a board position that is not already taken."
+	tie_message:	   	.asciiz "\nTie Game"
+	enterToContinue: 	.asciiz "Press 1 for the computer to go: "
+	header_1: 		.asciiz "  _____     _                      _____                            _____                  \n"
+	header_2: 		.asciiz " |_   _|   (_)     __       o O O |_   _|  __ _     __       o O O |_   _|   ___     ___   \n"
+	header_3: 		.asciiz "   | |     | |    / _|     o        | |   / _` |   / _|     o        | |    / _ \\   / -_)  \n"
+	header_4: 		.asciiz "  _|_|_   _|_|_   \\__|_   TS__[O]  _|_|_  \\__,_|   \\__|_   TS__[O]  _|_|_   \\___/   \\___|  \n"
+	header_5: 		.asciiz "_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| \n"
+	header_6: 		.asciiz "\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-' "
+	numOfBoardSpaces:  	.word 9
+	true:		   	.word 1
+	false:		   	.word 0
+	myArray: 	   	.byte ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '
+	input:			.byte '-'
 	
 	 
 .text
@@ -42,58 +46,16 @@ main:
 		
 		beq $s2, $s4, exitWhileLoop
 		
-		#GETTING THE COMPUTER MOVE
-		getComputerMoveX:
-		
-		#Getting random number 1-9 and storing it in t0
-		add $t0 $zero, 0 
-		li $a1,  9
-		li $v0,  42
-		syscall
-		addi $t0, $a0, 0
-		
-		#Checking to see if the number that was randomly rolled is already in use, if not, go to "input_valid_spaceX" if so, jump back to start of RandomNumberX
-		la $t1, myArray          		# Load the base address of myArray into $t1.
-		add $t1, $t1, $t0        		# $t1 = $t1 + $t0 for array address to access = base address + offset
-		lb $t2, ($t1)            		# Load the character at the array address into $t2.
-		li $t3, 32               		# The ASCII code for ' ' is 32.
-		beq $t2, $t3, input_valid_spaceX 	# Branch to input_valid_space
-		j getComputerMoveX
-		
-		#Since the random number is valid, input it onto the board
-		input_valid_spaceX:
-		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
-		la $t1, myArray	      	
-		add $t1, $t1, $t0	# $t1 = $t1 + $t0
-		sb $s1, ($t1)
-		
-		#new line
-		li $v0, 4
-		la $a0, newline
-		syscall
-		
-		#giving the user a buffer to continue the program to not overwhelm them
-		li $v0, 4
-		la $a0, enterToContinue
-		syscall
-		li $v0, 5
-		syscall
-		
-		#new line
-		li $v0, 4
-		la $a0, newline
-		syscall
-		
-		#printing the new board with the computers move on it
-		jal printBoard
-		
+		jal getComputerMove
+      		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
+      		jal printBoard 
       		# isWinYet      
       		
 		j whileLoopX		#  Jump back to the whileLoopX label
 	whileLoopO:
-		# getComputerMove
-      		# addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
-      		# jal printBoard 
+		jal getComputerMove
+      		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
+      		jal printBoard 
       		# isWinYet   
       		
       		beq $s2, $s4, exitWhileLoop
@@ -101,55 +63,6 @@ main:
       		jal userInput		#
 		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
 		jal printBoard		#
-		
-		#GETTING THE COMPUTER MOVE
-		getComputerMoveO:
-		
-		#Getting random number 1-9 and storing it in t0
-		add $t0 $zero, 0 
-		li $a1,  9
-		li $v0,  42
-		syscall
-		addi $t0, $a0, 0
-		
-		#Checking to see if the number that was randomly rolled is already in use, if not, go to "input_valid_spaceX" if so, jump back to start of RandomNumberX
-		la $t1, myArray          		# Load the base address of myArray into $t1.
-		add $t1, $t1, $t0        		# $t1 = $t1 + $t0 for array address to access = base address + offset
-		lb $t2, ($t1)            		# Load the character at the array address into $t2.
-		li $t3, 32               		# The ASCII code for ' ' is 32.
-		beq $t2, $t3, input_valid_spaceO	# Branch to input_valid_space
-		j getComputerMoveO
-		
-		#Since the random number is valid, input it onto the board
-		input_valid_spaceO:
-		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
-		la $t1, myArray	      	
-		add $t1, $t1, $t0	# $t1 = $t1 + $t0
-		sb $s1, ($t1)
-		
-		#new line
-		li $v0, 4
-		la $a0, newline
-		syscall
-		
-		#giving the user a buffer to continue the program to not overwhelm them
-		li $v0, 4
-		la $a0, enterToContinue
-		syscall
-		li $v0, 5
-		syscall
-		
-		#new line
-		li $v0, 4
-		la $a0, newline
-		syscall
-		
-		#printing the new board with the computers move on it
-		jal printBoard
-	
-		
-		
-		
 		# isWinYet
 	
 		j whileLoopO		# Jump back to the whileLoopO label
@@ -179,7 +92,18 @@ userXorO:
 # Read the character (X or O) the user rather play as.
 	li $v0, 12
 	syscall
-	add $s0, $v0, $zero	# $s0 = user's choice between X and O
+	add $s0, $v0, $zero		# $s0 = user's choice between X and O
+# Validate the user's input.
+	beq $s0, 88, input_valid_XO	# 88 is the ASCII code for 'X'
+    	beq $s0, 79, input_valid_XO	# 79 is the ASCII code for 'O'
+# Print an error message.
+	la $a0, error_message_X0
+	li $v0, 4
+	syscall
+# Call the function again.
+	j userXorO
+# Continue on as user input is confirmed valid.
+	input_valid_XO:
 # Determine whether the computer is X or O.
 	beq $s0, 88, else	# If user's choice == X, then branch
 	li $s1, 88		# $s1 = computer = X
@@ -216,9 +140,51 @@ userInput:
 	li $v0, 4
 	syscall
 # Read the board position inputed by the user.
-	li $v0, 5
+	#li $v0, 5
+	#syscall
+	# Read in as string
+	li $v0, 8
+	li $a1, 2
+	la $a0, input
 	syscall
-	add $t0, $v0, $zero	# $t0 = user's move position
+	# -48 to get numeric value and continue as normal
+	# Invalid if value is less than 48 or greater than 57
+	lb $t0, ($a0)
+	add $t0, $t0, -48
+	#add $t0, $v0, $zero	# $t0 = user's move position
+# Validate that the user's input is a integer between 1 and 9.
+	beq $t0, 1, input_valid_1_9	# 
+	beq $t0, 2, input_valid_1_9	# 
+	beq $t0, 3, input_valid_1_9	# 
+	beq $t0, 4, input_valid_1_9	# 
+	beq $t0, 5, input_valid_1_9	# 
+	beq $t0, 6, input_valid_1_9	# 
+	beq $t0, 7, input_valid_1_9	# 
+	beq $t0, 8, input_valid_1_9	# 
+	beq $t0, 9, input_valid_1_9	# 
+# Display error message.
+	la $a0, error_message_1_9
+	li $v0, 4
+	syscall
+# Call the userInput function again.
+	j userInput
+# Continue on as user input is confirmed a valid character between '1' through '9'.
+	input_valid_1_9:
+# Validate that the corresponding element in myArray holds ' '.
+	la $t1, myArray          	# Load the base address of myArray into $t1.
+	subi $t5, $t0, 1         	# $t0 = $t0 - 1 to convert the user's input into zero-based index.
+	add $t1, $t1, $t5        	# $t1 = $t1 + $t0 for array address to access = base address + offset
+	lb $t2, ($t1)            	# Load the character at the array address into $t2.
+	li $t3, 32               	# The ASCII code for ' ' is 32.
+	beq $t2, $t3, input_valid_space # Branch to input_valid_space
+# Display an error message.
+	la $a0, error_message_space
+	li $v0, 4
+	syscall
+# Call the userInput function again.
+	j userInput
+# Continue on as user input is confirmed to be corresponding to a free board position.
+	input_valid_space:
 # Save user's input into myArray.
 	la $t1, myArray	      	#
 	subi $t0, $t0, 1	# $t0 = $t0 - 1
@@ -227,12 +193,16 @@ userInput:
 	jr $ra			# return back to function call
 
 printBoard:
+# Print the tic-tac-toe board with 'X', 'O', or ' '
 	addi $sp, $sp, -4	#
 	sw $ra, 0($sp)		#
-	
 	li $t0, 3		# loop counter = 3
 	la $t1, myArray		# $t1 = base address of myArray
 	li $t2, 0 		# $t2 = offset
+	
+	la $a0, newline
+	li $v0, 4
+	syscall
 	
 	# Print the parts of the board that don't contain the user or computer's moves
 	forLoop1:
@@ -265,7 +235,7 @@ printBoard:
 		subi $t0, $t0, 1		# loop counter = loop counter - 1
 		j forLoop1			# Jump to loop1
 	accessArray:
-		# Print the user's and computer's moves
+	# Print the user's and computer's moves
 		add $t3, $t1, $t2	# $t3 = current array address = base address + offset
 		lb  $t4, ($t3)         	# $t4 = byte at current array address
 		la $a0, ($t4)		# Load character
@@ -302,3 +272,43 @@ displayHeader:
 	li $v0, 4
 	syscall
 	jr $ra
+	
+getComputerMove:
+# Getting random number 1-9 and storing it in t0
+	add $t0 $zero, 0 
+	li $a1,  9
+	li $v0,  42
+	syscall
+	addi $t0, $a0, 0
+		
+	# Checking to see if the number that was randomly rolled is already in use, if not, go to "input_valid_spaceX" if so, jump back to start of RandomNumberX
+	la $t1, myArray          		# Load the base address of myArray into $t1.
+	add $t1, $t1, $t0        		# $t1 = $t1 + $t0 for array address to access = base address + offset
+	lb $t2, ($t1)            		# Load the character at the array address into $t2.
+	li $t3, 32               		# The ASCII code for ' ' is 32.
+	beq $t2, $t3, input_valid_spaceX 	# Branch to input_valid_space
+	j getComputerMove
+		
+	# Since the random number is valid, input it onto the board
+	input_valid_spaceX:
+	addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
+	la $t1, myArray	      	
+	add $t1, $t1, $t0	# $t1 = $t1 + $t0
+	sb $s1, ($t1)
+	
+	li $v0, 4		# Print new line
+	la $a0, newline
+	syscall
+		
+	li $v0, 4		# Give the user a buffer to continue the program to not overwhelm them
+	la $a0, enterToContinue
+	syscall
+	li $v0, 5
+	syscall
+		
+	li $v0, 4		# Print new line
+	la $a0, newline
+	syscall
+	
+	jr $ra
+	
