@@ -21,16 +21,18 @@
 	header_4: 		.asciiz "  _|_|_   _|_|_   \\__|_   TS__[O]  _|_|_  \\__,_|   \\__|_   TS__[O]  _|_|_   \\___/   \\___|  \n"
 	header_5: 		.asciiz "_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| \n"
 	header_6: 		.asciiz "\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-' "
+	userWinMessage:    	.asciiz "User win!!!" 
+	userLoseMessage:   	.asciiz "User lost!!!" 
 	numOfBoardSpaces:  	.word 9
 	true:		   	.word 1
 	false:		   	.word 0
 	myArray: 	   	.byte ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '
 	input:			.byte '-'
-	
+
 	 
 .text
 main:
-	li $s2, 0			# $s2 = numOfMovesMade = 0
+	li $s7, 0			# $s2 = numOfMovesMade = 0
 	lw $s3, false			# $s3 = isTiePresent (true or false) set that to false(0)
 	lw $s4, numOfBoardSpaces	# $s4 = maxBoardMoves = 9
 	lw $s5, true			# $s5 = true = 1 
@@ -40,30 +42,30 @@ main:
 	
 	whileLoopX:
 		jal userInput		#
-		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
+		addi $s7, $s7, 1	# numOfMovesMade = numOfMovesMade + 1
 		jal printBoard		#
-		# isWinYet
+		jal isWinYet
 		
-		beq $s2, $s4, exitWhileLoop
+		beq $s7, $s4, exitWhileLoop
 		
 		jal getComputerMove
-      		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
+      		addi $s7, $s7, 1	# numOfMovesMade = numOfMovesMade + 1
       		jal printBoard 
-      		# isWinYet      
+      	 jal isWinYet      
       		
 		j whileLoopX		#  Jump back to the whileLoopX label
 	whileLoopO:
 		jal getComputerMove
-      		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
+      		addi $s7, $s7, 1	# numOfMovesMade = numOfMovesMade + 1
       		jal printBoard 
-      		# isWinYet   
+      		jal isWinYet   
       		
-      		beq $s2, $s4, exitWhileLoop
+      		beq $s7, $s4, exitWhileLoop
       		
       		jal userInput		#
-		addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
+		addi $s7, $s7, 1	# numOfMovesMade = numOfMovesMade + 1
 		jal printBoard		#
-		# isWinYet
+	    	jal isWinYet
 	
 		j whileLoopO		# Jump back to the whileLoopO label
 	exitWhileLoop:
@@ -312,3 +314,130 @@ getComputerMove:
 	
 	jr $ra
 	
+isWinYet:
+#diagonalWinCheck2
+# Check if there exists a matching character from top-left to bottom-right.
+	lb $t0, myArray   	  	# Load the 0th element in myArray representing the top-left spot.
+	lb $t1, myArray+4 	  	# Load the 4th element in myArray representing the middle-middle spot.
+	lb $t2, myArray+8 	  	# Load the 8th element in myArray representing the bottom-right spot.
+	beq $t0, ' ', diagonalWinCheck2 # Branch if top-left spot is empty.
+	beq $t1, ' ', diagonalWinCheck2 # Branch if middle-middle spot is empty.
+	beq $t2, ' ', diagonalWinCheck2 # Branch if bottom-right spot is empty.
+	bne $t0, $t1, diagonalWinCheck2 # Branch if top-left spot != middle-middle spot.
+	bne $t0, $t2, diagonalWinCheck2 # Branch if top-left spot != bottom-right spot.
+	# If code gets to this line then somebody won digonally
+	bne $t0, $s0, printuserlost
+	j printuserWin
+ 
+
+diagonalWinCheck2:
+# Check if there exists a matching character from top-right to bottom-left.
+	lb $t0, myArray+2 				# Load the 2nd element in myArray representing the top-right spot.
+	lb $t1, myArray+4 				# Load the 4th element in myArray representing the middle-middle spot.
+	lb $t2, myArray+6 				# Load the 6th element in myArray representing the top-left spot.
+	beq $t0, ' ', horizontalWinCheck1 		# Branch if top-right spot is empty.
+	beq $t1, ' ', horizontalWinCheck1 		# Branch if middle-middle spot is empty.
+	beq $t2, ' ', horizontalWinCheck1 		# Branch if bottom-left spot is empty.
+	bne $t0, $t1, horizontalWinCheck1		# Branch if top-right spot != middle-middle spot.
+	bne $t0, $t2, horizontalWinCheck1 		# Branch if middle-middle spot != bottom-left spot.
+	# If code gets to this line then somebody won digonally
+	bne $t0, $s0, printuserlost
+	j printuserWin
+
+horizontalWinCheck1:
+#Check if there exists a matching of all characters in row 1.
+    	lb $t0, myArray         			#Load the 0th element in myArray representing the top-left spot.
+    	lb $t1, myArray+1       			#Load the 1st element in myArray representing the top-middle spot.
+    	lb $t2, myArray+2       			#Load the 2nd element in myArray representing the top-right spot.
+    	beq $t0, ' ', horizontalWinCheck2 		# Branch if top-left spot is empty.
+	beq $t1, ' ', horizontalWinCheck2 		# Branch if top-middle is empty.
+	beq $t2, ' ', horizontalWinCheck2 		# Branch if top-right spot is empty.
+	bne $t0, $t1, horizontalWinCheck2		# Branch if top-left spot != top-middle spot.
+	bne $t0, $t2, horizontalWinCheck2 		# Branch if top-left spot != top-right spot.
+	# If code gets to this line then somebody won horizontaly
+	bne $t0, $s0, printuserlost
+	j printuserWin
+
+horizontalWinCheck2:
+#Check if there exists a matching of all characters in row 2.
+    	lb $t0, myArray+3       			#Load the 3rd element in myArray representing the middle-left spot.
+    	lb $t1, myArray+4       			#Load the 4th element in myArray representing the middle-middle spot.
+    	lb $t2, myArray+5       			#Load the 5th element in myArray representing the middle-right.
+    	beq $t0, ' ', horizontalWinCheck3 		# Branch if middle-left spot is empty.
+	beq $t1, ' ', horizontalWinCheck3 		# Branch if middle-middle spot is empty.
+	beq $t2, ' ', horizontalWinCheck3 		# Branch if middle-right spot is empty.
+	bne $t0, $t1, horizontalWinCheck3		# Branch if middle-left spot != middle-middle spot.
+	bne $t0, $t2, horizontalWinCheck3 		# Branch if middle-left spot != middle-right spot.
+	# If code gets to this line then somebody won horizontaly
+    	bne $t0, $s0, printuserlost
+	j printuserWin
+
+horizontalWinCheck3:
+#Check if there exists a matching of all characters in row 2.
+    	lb $t0, myArray+6       			#Load the 6th element in myArray representing the bottom-left spot.
+    	lb $t1, myArray+7       			#Load the 7th element in myArray representing the bottom-middled row.
+    	lb $t2, myArray+8       			#Load the 8th element in myArray representing the bottom-right spot.
+    	beq $t0, ' ', VerticalWinCheck1 		# Branch if bottom-left spot is empty.
+	beq $t1, ' ', VerticalWinCheck1 		# Branch if bottom-middle spot is empty.
+	beq $t2, ' ', VerticalWinCheck1 		# Branch if bottom-right spot is empty.
+	bne $t0, $t1, VerticalWinCheck1		    	# Branch if bottom-left spot != bottom-middle spot.
+	bne $t0, $t2, VerticalWinCheck1 		# Branch if bottom-left spot != bottom-right spot.
+	# If code gets to this line then somebody won horizontaly
+  	bne $t0, $s0, printuserlost
+	j printuserWin
+
+VerticalWinCheck1:
+# Check if there exists a matching character for the column 1.
+	lb $t0, myArray		    			# Load the 0th element in myArray representing the top-left spot.
+	lb $t1, myArray+3 	    			# Load the 3rd element in myArray representing the middle-left spot.
+	lb $t2, myArray+6				# Load the 6th element in myArray representing the bottom-left spot.
+	beq $t0, ' ', VerticalWinCheck2			# Branch if top-left spot is empty.
+	beq $t1, ' ', VerticalWinCheck2 		# Branch if middle-left spot is empty.
+	beq $t2, ' ', VerticalWinCheck2	    		# Branch if bottom-left spot is empty.
+	bne $t0, $t1, VerticalWinCheck2			# Branch if top-lfet spot != middle-left spot.
+	bne $t0, $t2, VerticalWinCheck2	    		# Branch if middle-left spot != bottom-left spot.
+	# If code gets to this line then somebody won vertically
+	bne $t0, $s0, printuserlost
+	j printuserWin
+
+   
+VerticalWinCheck2:
+# Check if there exists a matching character for the column 2.
+	lb $t0, myArray+1	    			# Load the 1st element in myArray representing the top-middle spot.
+	lb $t1, myArray+4 	    			# Load the 4th element in myArray representing the middle-middle spot.
+	lb $t2, myArray+7				# Load the 6th element in myArray representing the bottom-middle spot.
+	beq $t0, ' ', VerticalWinCheck3 		# Branch if top-middle spot is empty.
+	beq $t1, ' ', VerticalWinCheck3 		# Branch if middle-middle spot is empty.
+	beq $t2, ' ', VerticalWinCheck3		    	# Branch if bottom-middle  spot is empty.
+	bne $t0, $t1, VerticalWinCheck3	        	# Branch if top-middle  spot != middle-middle spot.
+	bne $t0, $t2, VerticalWinCheck3  	    	# Branch if top-middle spot != bottom-middle spot.
+	# If code gets to this line then somebody won vertically
+   	bne $t0, $s0, printuserlost
+	j printuserWin
+    
+VerticalWinCheck3:
+# Check if there exists a matching character for the column 3.
+	lb $t0, myArray+2	    			# Load the 2nd element in myArray representing the top-right spot.
+	lb $t1, myArray+5	    			# Load the 5th element in myArray representing the middle-right spot.
+	lb $t2, myArray+8				# Load the 8th element in myArray representing the bottom-right spot.
+	beq $t0, ' ', end1				# Branch if top-right spot is empty.
+	beq $t1, ' ', end1				# Branch if middle-right spot is empty.
+	beq $t2, ' ', end1				# Branch if bottom-right spot is empty.
+	bne $t0, $t1, end1				# Branch if top-right spot != middle-right spot.
+	bne $t0, $t2, end1	    			# Branch if top-right spot != bottom-right spot.
+	# If code gets to this line then somebody won vertically
+	bne $t0, $s0, printuserlost
+	j printuserWin
+	
+printuserWin:
+	la $a0, userWinMessage     # Display user win message 
+	li $v0, 4
+    	syscall
+    	j skipTieMessage
+printuserlost:
+	la $a0, userLoseMessage    # Display user lost message 
+	li $v0, 4
+    	syscall  
+    	j skipTieMessage
+end1: 
+    	jr $ra 
