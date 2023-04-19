@@ -21,8 +21,8 @@
 	header_4: 		.asciiz "  _|_|_   _|_|_   \\__|_   TS__[O]  _|_|_  \\__,_|   \\__|_   TS__[O]  _|_|_   \\___/   \\___|  \n"
 	header_5: 		.asciiz "_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| \n"
 	header_6: 		.asciiz "\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-' "
-	userWinMessage:    	.asciiz "User win!!!" 
-	userLoseMessage:   	.asciiz "User lost!!!" 
+	userWinMessage:    	.asciiz "You Won!" 
+	userLoseMessage:   	.asciiz "You Lost..." 
 	numOfBoardSpaces:  	.word 9
 	true:		   	.word 1
 	false:		   	.word 0
