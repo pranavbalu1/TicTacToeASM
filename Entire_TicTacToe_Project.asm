@@ -1,34 +1,33 @@
 .data
-	str1: 			.asciiz "\nYour Turn: Enter the board position of your move (1-9): "
-	input_board_str1:  	.asciiz "\n 1 | 2 | 3 \n"
-	input_board_str2:  	.asciiz "---+---+---\n"
-	input_board_str3:  	.asciiz " 4 | 5 | 6 \n"
-	input_board_str4:  	.asciiz "---+---+---\n"
-	input_board_str5:  	.asciiz " 7 | 8 | 9 \n"
-	output_board_str1: 	.asciiz " "
-	output_board_str2: 	.asciiz " | "
-	output_board_str3: 	.asciiz "---+---+---\n"
 	newline:	   	.asciiz "\n"
-	input_X_or_O:	   	.asciiz "\nInput whether you would like to play as X or O: "
-	error_message_X0:  	.asciiz "\nError: You may only enter 'X' or 'O' (Capitalized)."
-	error_message_1_9: 	.asciiz "\nError: You may not enter a number below 1 or above 9."
-	error_message_space:	.asciiz "\nError: You may only choose a board position that is not already taken."
-	tie_message:	   	.asciiz "\nTie Game"
-	enterToContinue: 	.asciiz "Press 1 for the computer to go: "
 	header_1: 		.asciiz "  _____     _                      _____                            _____                  \n"
 	header_2: 		.asciiz " |_   _|   (_)     __       o O O |_   _|  __ _     __       o O O |_   _|   ___     ___   \n"
 	header_3: 		.asciiz "   | |     | |    / _|     o        | |   / _` |   / _|     o        | |    / _ \\   / -_)  \n"
 	header_4: 		.asciiz "  _|_|_   _|_|_   \\__|_   TS__[O]  _|_|_  \\__,_|   \\__|_   TS__[O]  _|_|_   \\___/   \\___|  \n"
 	header_5: 		.asciiz "_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| {======|_|\"\"\"\"\"|_|\"\"\"\"\"|_|\"\"\"\"\"| \n"
 	header_6: 		.asciiz "\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-'./o--000'\"`-0-0-'\"`-0-0-'\"`-0-0-' "
-	userWinMessage:    	.asciiz "You Won!" 
-	userLoseMessage:   	.asciiz "You Lost..." 
+	input_X_or_O:	   	.asciiz "\nInput whether you would like to play as X or O: "
+	error_message_X0:  	.asciiz "\nError: You may only enter 'X' or 'O' (Capitalized)."
+	input_board_str1:  	.asciiz "\n 1 | 2 | 3 \n"
+	input_board_str2:  	.asciiz "---+---+---\n"
+	input_board_str3:  	.asciiz " 4 | 5 | 6 \n"
+	input_board_str4:  	.asciiz "---+---+---\n"
+	input_board_str5:  	.asciiz " 7 | 8 | 9 \n"
+	user_input_str1: 	.asciiz "\nYour Turn: Enter the board position of your move (1-9): "
+	error_message_1_9: 	.asciiz "\nError: You may not enter a number below 1 or above 9."
+	error_message_space:	.asciiz "\nError: You may only choose a board position that is not already taken."
+	computer_move_str1: 	.asciiz "\nComputer's Turn: "
+	output_board_str1: 	.asciiz " "
+	output_board_str2: 	.asciiz " | "
+	output_board_str3: 	.asciiz "---+---+---\n"
+	user_won_message:    	.asciiz "\nYou Won!" 
+	user_lost_message:   	.asciiz "\nYou Lost..." 
+	tie_message:	   	.asciiz "\nTie Game"
 	numOfBoardSpaces:  	.word 9
 	true:		   	.word 1
 	false:		   	.word 0
 	myArray: 	   	.byte ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' '
 	input:			.byte '-'
-
 	 
 .text
 main:
@@ -36,44 +35,32 @@ main:
 	lw $s3, false			# $s3 = isTiePresent (true or false) set that to false(0)
 	lw $s4, numOfBoardSpaces	# $s4 = maxBoardMoves = 9
 	lw $s5, true			# $s5 = true = 1 
-	
-	jal displayHeader
+
+	jal displayHeader		# Display the header for the Tic-Tac-Toe Game
 	j userXorO			# Ask the user whether they rather play as X or O
 	
 	whileLoopX:
-		jal userInput		#
-		addi $s7, $s7, 1	# numOfMovesMade = numOfMovesMade + 1
-		jal printBoard		#
-		jal isWinYet
-		
-		beq $s7, $s4, exitWhileLoop
-		
-		jal getComputerMove
-      		addi $s7, $s7, 1	# numOfMovesMade = numOfMovesMade + 1
-      		jal printBoard 
-      	 jal isWinYet      
-      		
-		j whileLoopX		#  Jump back to the whileLoopX label
+		jal userInput			# Get the user's input for their move
+		addi $s7, $s7, 1		# numOfMovesMade = numOfMovesMade + 1
+		jal printBoard			# Print the board containing the moves
+		jal isWinYet			# Check if anybody has won the game yet
+		beq $s7, $s4, tieMessage	# Check if the number of moves made = the max board spots available
+		jal getComputerMove		# Get the computer's move
+      		addi $s7, $s7, 1		# numOfMovesMade = numOfMovesMade + 1
+      		jal printBoard 			# Print the board containing the moves
+      	 	jal isWinYet      		# Check if anybody has won the game yet
+		j whileLoopX			#  Jump back to the whileLoopX label
 	whileLoopO:
-		jal getComputerMove
-      		addi $s7, $s7, 1	# numOfMovesMade = numOfMovesMade + 1
-      		jal printBoard 
-      		jal isWinYet   
-      		
-      		beq $s7, $s4, exitWhileLoop
-      		
-      		jal userInput		#
-		addi $s7, $s7, 1	# numOfMovesMade = numOfMovesMade + 1
-		jal printBoard		#
-	    	jal isWinYet
-	
-		j whileLoopO		# Jump back to the whileLoopO label
-	exitWhileLoop:
-		li $s3,  1		# $s3 = isTiePresent (true or false) = 1 (true)
-		
-		beq $s3, $s5, tieMessage	# If isTiePresent == true then branch to tieMessage
-		j skipTieMessage		# Jump to the skipTieMessage label
-		
+		jal getComputerMove		# Get the computer's move
+      		addi $s7, $s7, 1		# numOfMovesMade = numOfMovesMade + 1
+      		jal printBoard 			# Print the board containing the moves
+      		jal isWinYet   			# Check if anybody has won the game yet
+      		beq $s7, $s4, tieMessage	# Check if the number of moves made = the max board spots available
+      		jal userInput			# Get the user's input for their move
+		addi $s7, $s7, 1		# numOfMovesMade = numOfMovesMade + 1
+		jal printBoard			# Print the board containing the moves
+	    	jal isWinYet			# Check if anybody has won the game yet
+		j whileLoopO			# Jump back to the whileLoopO label
 	tieMessage:
 		la $a0, tie_message		# Display the tie message
 		li $v0, 4
@@ -138,12 +125,10 @@ userInput:
 	li $v0, 4
 	syscall
 # Print the prompt asking for the row of the user's move.
-	la $a0, str1
+	la $a0, user_input_str1
 	li $v0, 4
 	syscall
 # Read the board position inputed by the user.
-	#li $v0, 5
-	#syscall
 	# Read in as string
 	li $v0, 8
 	li $a1, 2
@@ -153,17 +138,16 @@ userInput:
 	# Invalid if value is less than 48 or greater than 57
 	lb $t0, ($a0)
 	add $t0, $t0, -48
-	#add $t0, $v0, $zero	# $t0 = user's move position
 # Validate that the user's input is a integer between 1 and 9.
-	beq $t0, 1, input_valid_1_9	# 
-	beq $t0, 2, input_valid_1_9	# 
-	beq $t0, 3, input_valid_1_9	# 
-	beq $t0, 4, input_valid_1_9	# 
-	beq $t0, 5, input_valid_1_9	# 
-	beq $t0, 6, input_valid_1_9	# 
-	beq $t0, 7, input_valid_1_9	# 
-	beq $t0, 8, input_valid_1_9	# 
-	beq $t0, 9, input_valid_1_9	# 
+	beq $t0, 1, input_valid_1_9	# Branch to input_valid_1_9 if $t0 == 1
+	beq $t0, 2, input_valid_1_9	# Branch to input_valid_1_9 if $t0 == 2
+	beq $t0, 3, input_valid_1_9	# Branch to input_valid_1_9 if $t0 == 3
+	beq $t0, 4, input_valid_1_9	# Branch to input_valid_1_9 if $t0 == 4
+	beq $t0, 5, input_valid_1_9	# Branch to input_valid_1_9 if $t0 == 5
+	beq $t0, 6, input_valid_1_9	# Branch to input_valid_1_9 if $t0 == 6
+	beq $t0, 7, input_valid_1_9	# Branch to input_valid_1_9 if $t0 == 7
+	beq $t0, 8, input_valid_1_9	# Branch to input_valid_1_9 if $t0 == 8
+	beq $t0, 9, input_valid_1_9	# Branch to input_valid_1_9 if $t0 == 9
 # Display error message.
 	la $a0, error_message_1_9
 	li $v0, 4
@@ -180,7 +164,7 @@ userInput:
 	li $t3, 32               	# The ASCII code for ' ' is 32.
 	beq $t2, $t3, input_valid_space # Branch to input_valid_space
 # Display an error message.
-	la $a0, error_message_space
+	la $a0, error_message_space	
 	li $v0, 4
 	syscall
 # Call the userInput function again.
@@ -188,7 +172,7 @@ userInput:
 # Continue on as user input is confirmed to be corresponding to a free board position.
 	input_valid_space:
 # Save user's input into myArray.
-	la $t1, myArray	      	#
+	la $t1, myArray	      	# Load the base address of myArray into $t1
 	subi $t0, $t0, 1	# $t0 = $t0 - 1
 	add $t1, $t1, $t0	# $t1 = $t1 + $t0
 	sb $s0, ($t1)		# Store the character into the array address
@@ -196,17 +180,17 @@ userInput:
 
 printBoard:
 # Print the tic-tac-toe board with 'X', 'O', or ' '
-	addi $sp, $sp, -4	#
-	sw $ra, 0($sp)		#
+	addi $sp, $sp, -4	# Reserve 1 word from the stack pointer
+	sw $ra, 0($sp)		# Store the return address where the stack pointer is
 	li $t0, 3		# loop counter = 3
 	la $t1, myArray		# $t1 = base address of myArray
 	li $t2, 0 		# $t2 = offset
 	
-	la $a0, newline
+	la $a0, newline		# Print a newline
 	li $v0, 4
 	syscall
 	
-	# Print the parts of the board that don't contain the user or computer's moves
+# Print the parts of the board that don't contain the user or computer's moves
 	forLoop1:
 		beq $t0, $zero, exitForLoop1	# exit out forLoop1 when branch counter == 0
 		la $a0, output_board_str1
@@ -224,7 +208,7 @@ printBoard:
 		la $a0, output_board_str1
 		li $v0, 4
 		syscall
-		la $a0, newline
+		la $a0, newline			# Print a newline
 		li $v0, 4
 		syscall
 		
@@ -244,14 +228,17 @@ printBoard:
 		li $v0, 11		# Print character
 		syscall
 		addi $t2, $t2, 1	# $t2 = $t2 + 1
-		jr $ra
+		jr $ra			# Jump and return back to line after function call
 	exitForLoop1:
-	lw $ra, 0($sp)			#
-	addi $sp, $sp, 4		#
-	jr $ra				#
+	lw $ra, 0($sp)			# Load the address from the stack pointer into the return address register
+	addi $sp, $sp, 4		# Move the stack pointer back up 1 word
+	jr $ra				# Jump and return back to line after function call
 
 displayHeader:
 # Print the ascii art for the "Tic Tac Toe" header.
+	li $v0, 4	# Print a new line
+	la $a0, newline
+	syscall
 	la $a0, header_1
 	li $v0, 4
 	syscall
@@ -270,13 +257,14 @@ displayHeader:
 	la $a0, header_6
 	li $v0, 4
 	syscall
-	la $a0, newline
+	la $a0, newline	# Print a newline
 	li $v0, 4
 	syscall
-	jr $ra
+	jr $ra		# Jump and return back to line after function call
 	
 getComputerMove:
-# Getting random number 1-9 and storing it in t0
+# Randomly choose an integer 1-9 and store the computer's character into myArray if position is free
+	# Getting random number 1-9 and storing it in t0
 	add $t0 $zero, 0 
 	li $a1,  9
 	li $v0,  42
@@ -294,150 +282,132 @@ getComputerMove:
 	# Since the random number is valid, input it onto the board
 	input_valid_spaceX:
 	addi $s2, $s2, 1	# numOfMovesMade = numOfMovesMade + 1
-	la $t1, myArray	      	
+	la $t1, myArray	      	# Load base address of myArray into $t1
 	add $t1, $t1, $t0	# $t1 = $t1 + $t0
-	sb $s1, ($t1)
-	
-	li $v0, 4		# Print new line
-	la $a0, newline
-	syscall
-		
-	li $v0, 4		# Give the user a buffer to continue the program to not overwhelm them
-	la $a0, enterToContinue
-	syscall
-	li $v0, 5
-	syscall
-		
-	li $v0, 4		# Print new line
-	la $a0, newline
+	sb $s1, ($t1)		# Store byte
+
+	li $v0, 4		# Print computer_move_str1
+	la $a0, computer_move_str1
 	syscall
 	
-	jr $ra
+	jr $ra			# Jump and return back to line after function call
 	
 isWinYet:
-#diagonalWinCheck2
 # Check if there exists a matching character from top-left to bottom-right.
-	lb $t0, myArray   	  	# Load the 0th element in myArray representing the top-left spot.
-	lb $t1, myArray+4 	  	# Load the 4th element in myArray representing the middle-middle spot.
-	lb $t2, myArray+8 	  	# Load the 8th element in myArray representing the bottom-right spot.
-	beq $t0, ' ', diagonalWinCheck2 # Branch if top-left spot is empty.
-	beq $t1, ' ', diagonalWinCheck2 # Branch if middle-middle spot is empty.
-	beq $t2, ' ', diagonalWinCheck2 # Branch if bottom-right spot is empty.
-	bne $t0, $t1, diagonalWinCheck2 # Branch if top-left spot != middle-middle spot.
-	bne $t0, $t2, diagonalWinCheck2 # Branch if top-left spot != bottom-right spot.
+	lb $t0, myArray   	  		# Load the 0th element in myArray representing the top-left spot.
+	lb $t1, myArray+4 	  		# Load the 4th element in myArray representing the middle-middle spot.
+	lb $t2, myArray+8 	  		# Load the 8th element in myArray representing the bottom-right spot.
+	beq $t0, ' ', diagonalWinCheck2 	# Branch if top-left spot is empty.
+	beq $t1, ' ', diagonalWinCheck2 	# Branch if middle-middle spot is empty.
+	beq $t2, ' ', diagonalWinCheck2 	# Branch if bottom-right spot is empty.
+	bne $t0, $t1, diagonalWinCheck2 	# Branch if top-left spot != middle-middle spot.
+	bne $t0, $t2, diagonalWinCheck2 	# Branch if top-left spot != bottom-right spot.
 	# If code gets to this line then somebody won digonally
-	bne $t0, $s0, printuserlost
-	j printuserWin
- 
-
+	bne $t0, $s0, printUserLostMessage	# Jump to printUserLostMessage if $t0 != user's character
+	j printUserWonMessage			# Jump to printUserWonMessage 
 diagonalWinCheck2:
 # Check if there exists a matching character from top-right to bottom-left.
-	lb $t0, myArray+2 				# Load the 2nd element in myArray representing the top-right spot.
-	lb $t1, myArray+4 				# Load the 4th element in myArray representing the middle-middle spot.
-	lb $t2, myArray+6 				# Load the 6th element in myArray representing the top-left spot.
-	beq $t0, ' ', horizontalWinCheck1 		# Branch if top-right spot is empty.
-	beq $t1, ' ', horizontalWinCheck1 		# Branch if middle-middle spot is empty.
-	beq $t2, ' ', horizontalWinCheck1 		# Branch if bottom-left spot is empty.
-	bne $t0, $t1, horizontalWinCheck1		# Branch if top-right spot != middle-middle spot.
-	bne $t0, $t2, horizontalWinCheck1 		# Branch if middle-middle spot != bottom-left spot.
+	lb $t0, myArray+2 			# Load the 2nd element in myArray representing the top-right spot.
+	lb $t1, myArray+4 			# Load the 4th element in myArray representing the middle-middle spot.
+	lb $t2, myArray+6 			# Load the 6th element in myArray representing the top-left spot.
+	beq $t0, ' ', horizontalWinCheck1 	# Branch if top-right spot is empty.
+	beq $t1, ' ', horizontalWinCheck1 	# Branch if middle-middle spot is empty.
+	beq $t2, ' ', horizontalWinCheck1 	# Branch if bottom-left spot is empty.
+	bne $t0, $t1, horizontalWinCheck1	# Branch if top-right spot != middle-middle spot.
+	bne $t0, $t2, horizontalWinCheck1 	# Branch if middle-middle spot != bottom-left spot.
 	# If code gets to this line then somebody won digonally
-	bne $t0, $s0, printuserlost
-	j printuserWin
-
+	bne $t0, $s0, printUserLostMessage	# Jump to printUserLostMessage if $t0 != user's character
+	j printUserWonMessage			# Jump to printUserWonMessage
 horizontalWinCheck1:
-#Check if there exists a matching of all characters in row 1.
-    	lb $t0, myArray         			#Load the 0th element in myArray representing the top-left spot.
-    	lb $t1, myArray+1       			#Load the 1st element in myArray representing the top-middle spot.
-    	lb $t2, myArray+2       			#Load the 2nd element in myArray representing the top-right spot.
-    	beq $t0, ' ', horizontalWinCheck2 		# Branch if top-left spot is empty.
-	beq $t1, ' ', horizontalWinCheck2 		# Branch if top-middle is empty.
-	beq $t2, ' ', horizontalWinCheck2 		# Branch if top-right spot is empty.
-	bne $t0, $t1, horizontalWinCheck2		# Branch if top-left spot != top-middle spot.
-	bne $t0, $t2, horizontalWinCheck2 		# Branch if top-left spot != top-right spot.
+# Check if there exists a matching of all characters in row 1.
+    	lb $t0, myArray         		# Load the 0th element in myArray representing the top-left spot.
+    	lb $t1, myArray+1       		# Load the 1st element in myArray representing the top-middle spot.
+    	lb $t2, myArray+2       		# Load the 2nd element in myArray representing the top-right spot.
+    	beq $t0, ' ', horizontalWinCheck2 	# Branch if top-left spot is empty.
+	beq $t1, ' ', horizontalWinCheck2 	# Branch if top-middle is empty.
+	beq $t2, ' ', horizontalWinCheck2 	# Branch if top-right spot is empty.
+	bne $t0, $t1, horizontalWinCheck2	# Branch if top-left spot != top-middle spot.
+	bne $t0, $t2, horizontalWinCheck2 	# Branch if top-left spot != top-right spot.
 	# If code gets to this line then somebody won horizontaly
-	bne $t0, $s0, printuserlost
-	j printuserWin
-
+	bne $t0, $s0, printUserLostMessage	# Jump to printUserLostMessage if $t0 != user's character
+	j printUserWonMessage			# Jump to printUserWonMessage
 horizontalWinCheck2:
-#Check if there exists a matching of all characters in row 2.
-    	lb $t0, myArray+3       			#Load the 3rd element in myArray representing the middle-left spot.
-    	lb $t1, myArray+4       			#Load the 4th element in myArray representing the middle-middle spot.
-    	lb $t2, myArray+5       			#Load the 5th element in myArray representing the middle-right.
-    	beq $t0, ' ', horizontalWinCheck3 		# Branch if middle-left spot is empty.
-	beq $t1, ' ', horizontalWinCheck3 		# Branch if middle-middle spot is empty.
-	beq $t2, ' ', horizontalWinCheck3 		# Branch if middle-right spot is empty.
-	bne $t0, $t1, horizontalWinCheck3		# Branch if middle-left spot != middle-middle spot.
-	bne $t0, $t2, horizontalWinCheck3 		# Branch if middle-left spot != middle-right spot.
+# Check if there exists a matching of all characters in row 2.
+    	lb $t0, myArray+3       		# Load the 3rd element in myArray representing the middle-left spot.
+    	lb $t1, myArray+4       		# Load the 4th element in myArray representing the middle-middle spot.
+    	lb $t2, myArray+5       		# Load the 5th element in myArray representing the middle-right.
+    	beq $t0, ' ', horizontalWinCheck3 	# Branch if middle-left spot is empty.
+	beq $t1, ' ', horizontalWinCheck3 	# Branch if middle-middle spot is empty.
+	beq $t2, ' ', horizontalWinCheck3 	# Branch if middle-right spot is empty.
+	bne $t0, $t1, horizontalWinCheck3	# Branch if middle-left spot != middle-middle spot.
+	bne $t0, $t2, horizontalWinCheck3 	# Branch if middle-left spot != middle-right spot.
 	# If code gets to this line then somebody won horizontaly
-    	bne $t0, $s0, printuserlost
-	j printuserWin
-
+    	bne $t0, $s0, printUserLostMessage	# Jump to printUserLostMessage if $t0 != user's character
+	j printUserWonMessage			# Jump to printUserWonMessage
 horizontalWinCheck3:
-#Check if there exists a matching of all characters in row 2.
-    	lb $t0, myArray+6       			#Load the 6th element in myArray representing the bottom-left spot.
-    	lb $t1, myArray+7       			#Load the 7th element in myArray representing the bottom-middled row.
-    	lb $t2, myArray+8       			#Load the 8th element in myArray representing the bottom-right spot.
-    	beq $t0, ' ', VerticalWinCheck1 		# Branch if bottom-left spot is empty.
-	beq $t1, ' ', VerticalWinCheck1 		# Branch if bottom-middle spot is empty.
-	beq $t2, ' ', VerticalWinCheck1 		# Branch if bottom-right spot is empty.
-	bne $t0, $t1, VerticalWinCheck1		    	# Branch if bottom-left spot != bottom-middle spot.
-	bne $t0, $t2, VerticalWinCheck1 		# Branch if bottom-left spot != bottom-right spot.
+# Check if there exists a matching of all characters in row 2.
+    	lb $t0, myArray+6       		# Load the 6th element in myArray representing the bottom-left spot.
+    	lb $t1, myArray+7       		# Load the 7th element in myArray representing the bottom-middled row.
+    	lb $t2, myArray+8       		# Load the 8th element in myArray representing the bottom-right spot.
+    	beq $t0, ' ', VerticalWinCheck1 	# Branch if bottom-left spot is empty.
+	beq $t1, ' ', VerticalWinCheck1 	# Branch if bottom-middle spot is empty.
+	beq $t2, ' ', VerticalWinCheck1 	# Branch if bottom-right spot is empty.
+	bne $t0, $t1, VerticalWinCheck1		# Branch if bottom-left spot != bottom-middle spot.
+	bne $t0, $t2, VerticalWinCheck1 	# Branch if bottom-left spot != bottom-right spot.
 	# If code gets to this line then somebody won horizontaly
-  	bne $t0, $s0, printuserlost
-	j printuserWin
-
+  	bne $t0, $s0, printUserLostMessage	# Jump to printUserLostMessage if $t0 != user's character
+	j printUserWonMessage			# Jump to printUserWonMessage
 VerticalWinCheck1:
 # Check if there exists a matching character for the column 1.
-	lb $t0, myArray		    			# Load the 0th element in myArray representing the top-left spot.
-	lb $t1, myArray+3 	    			# Load the 3rd element in myArray representing the middle-left spot.
-	lb $t2, myArray+6				# Load the 6th element in myArray representing the bottom-left spot.
-	beq $t0, ' ', VerticalWinCheck2			# Branch if top-left spot is empty.
-	beq $t1, ' ', VerticalWinCheck2 		# Branch if middle-left spot is empty.
-	beq $t2, ' ', VerticalWinCheck2	    		# Branch if bottom-left spot is empty.
-	bne $t0, $t1, VerticalWinCheck2			# Branch if top-lfet spot != middle-left spot.
-	bne $t0, $t2, VerticalWinCheck2	    		# Branch if middle-left spot != bottom-left spot.
+	lb $t0, myArray		    		# Load the 0th element in myArray representing the top-left spot.
+	lb $t1, myArray+3 	    		# Load the 3rd element in myArray representing the middle-left spot.
+	lb $t2, myArray+6			# Load the 6th element in myArray representing the bottom-left spot.
+	beq $t0, ' ', VerticalWinCheck2		# Branch if top-left spot is empty.
+	beq $t1, ' ', VerticalWinCheck2 	# Branch if middle-left spot is empty.
+	beq $t2, ' ', VerticalWinCheck2	    	# Branch if bottom-left spot is empty.
+	bne $t0, $t1, VerticalWinCheck2		# Branch if top-lfet spot != middle-left spot.
+	bne $t0, $t2, VerticalWinCheck2	    	# Branch if middle-left spot != bottom-left spot.
 	# If code gets to this line then somebody won vertically
-	bne $t0, $s0, printuserlost
-	j printuserWin
-
-   
+	bne $t0, $s0, printUserLostMessage	# Jump to printUserLostMessage if $t0 != user's character
+	j printUserWonMessage			# Jump to printUserWonMessage
 VerticalWinCheck2:
 # Check if there exists a matching character for the column 2.
-	lb $t0, myArray+1	    			# Load the 1st element in myArray representing the top-middle spot.
-	lb $t1, myArray+4 	    			# Load the 4th element in myArray representing the middle-middle spot.
-	lb $t2, myArray+7				# Load the 6th element in myArray representing the bottom-middle spot.
-	beq $t0, ' ', VerticalWinCheck3 		# Branch if top-middle spot is empty.
-	beq $t1, ' ', VerticalWinCheck3 		# Branch if middle-middle spot is empty.
-	beq $t2, ' ', VerticalWinCheck3		    	# Branch if bottom-middle  spot is empty.
-	bne $t0, $t1, VerticalWinCheck3	        	# Branch if top-middle  spot != middle-middle spot.
-	bne $t0, $t2, VerticalWinCheck3  	    	# Branch if top-middle spot != bottom-middle spot.
+	lb $t0, myArray+1	    		# Load the 1st element in myArray representing the top-middle spot.
+	lb $t1, myArray+4 	    		# Load the 4th element in myArray representing the middle-middle spot.
+	lb $t2, myArray+7			# Load the 6th element in myArray representing the bottom-middle spot.
+	beq $t0, ' ', VerticalWinCheck3 	# Branch if top-middle spot is empty.
+	beq $t1, ' ', VerticalWinCheck3 	# Branch if middle-middle spot is empty.
+	beq $t2, ' ', VerticalWinCheck3		# Branch if bottom-middle  spot is empty.
+	bne $t0, $t1, VerticalWinCheck3	        # Branch if top-middle  spot != middle-middle spot.
+	bne $t0, $t2, VerticalWinCheck3  	# Branch if top-middle spot != bottom-middle spot.
 	# If code gets to this line then somebody won vertically
-   	bne $t0, $s0, printuserlost
-	j printuserWin
-    
+   	bne $t0, $s0, printUserLostMessage	# Jump to printUserLostMessage if $t0 != user's character
+	j printUserWonMessage			# Jump to printUserWonMessage
 VerticalWinCheck3:
 # Check if there exists a matching character for the column 3.
-	lb $t0, myArray+2	    			# Load the 2nd element in myArray representing the top-right spot.
-	lb $t1, myArray+5	    			# Load the 5th element in myArray representing the middle-right spot.
-	lb $t2, myArray+8				# Load the 8th element in myArray representing the bottom-right spot.
-	beq $t0, ' ', end1				# Branch if top-right spot is empty.
-	beq $t1, ' ', end1				# Branch if middle-right spot is empty.
-	beq $t2, ' ', end1				# Branch if bottom-right spot is empty.
-	bne $t0, $t1, end1				# Branch if top-right spot != middle-right spot.
-	bne $t0, $t2, end1	    			# Branch if top-right spot != bottom-right spot.
+	lb $t0, myArray+2	    		# Load the 2nd element in myArray representing the top-right spot.
+	lb $t1, myArray+5	    		# Load the 5th element in myArray representing the middle-right spot.
+	lb $t2, myArray+8			# Load the 8th element in myArray representing the bottom-right spot.
+	beq $t0, ' ', end1			# Branch if top-right spot is empty.
+	beq $t1, ' ', end1			# Branch if middle-right spot is empty.
+	beq $t2, ' ', end1			# Branch if bottom-right spot is empty.
+	bne $t0, $t1, end1			# Branch if top-right spot != middle-right spot.
+	bne $t0, $t2, end1	    		# Branch if top-right spot != bottom-right spot.
 	# If code gets to this line then somebody won vertically
-	bne $t0, $s0, printuserlost
-	j printuserWin
+	bne $t0, $s0, printUserLostMessage	# Jump to printUserLostMessage if $t0 != user's character
+	j printUserWonMessage			# Jump to printUserWonMessage
 	
-printuserWin:
-	la $a0, userWinMessage     # Display user win message 
+printUserWonMessage:
+	la $a0, user_won_message     		# Display user win message 
 	li $v0, 4
     	syscall
-    	j skipTieMessage
-printuserlost:
-	la $a0, userLoseMessage    # Display user lost message 
+    	j skipTieMessage			# Jump to skipTieMessage
+    	
+printUserLostMessage:
+	la $a0, user_lost_message    		# Display user lost message 
 	li $v0, 4
     	syscall  
-    	j skipTieMessage
+    	j skipTieMessage			# Jump to skipTieMessage
 end1: 
-    	jr $ra 
+    	jr $ra 					# Jump and return back to line after function call
+
